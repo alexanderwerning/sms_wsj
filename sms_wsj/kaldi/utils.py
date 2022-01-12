@@ -115,7 +115,7 @@ def _get_wav_command_for_audio_dir(
 
 def create_data_dir(
         kaldi_dir, db=None, json_path=None, dataset_names=None,
-        data_type='wsj_8k', target_speaker=0, ref_channels=0):
+        data_type='wsj_8k', target_speaker=None, ref_channels=0):
     """
     Wrapper calling _create_data_dir for data_dirs from json or db object
     """
@@ -140,7 +140,7 @@ def create_data_dir(
 def create_data_dir_from_audio_dir(
         audio_dir, kaldi_dir, id_to_file_name='{id}_{spk}.wav', db=None,
         json_path=None, dataset_names=None, data_type='wsj_8k',
-        target_speaker=0, ref_channels=0
+        target_speaker=None, ref_channels=0
 ):
     """
     Wrapper calling _create_data_dir for data_dirs from audio_dir
@@ -176,7 +176,7 @@ def create_data_dir_from_audio_dir(
 
 def _create_data_dir(
         get_wav_command_fn, kaldi_dir, db=None, json_path=None,
-        dataset_names=None, data_type='wsj_8k', target_speaker=0,
+        dataset_names=None, data_type='wsj_8k', target_speaker=None,
         ref_channels=0,
 ):
     """
@@ -217,7 +217,7 @@ def _create_data_dir(
         dataset_names = ('train_si284', 'cv_dev93', 'test_eval92')
     elif isinstance(dataset_names, str):
         dataset_names = [dataset_names]
-    if not isinstance(target_speaker, (list, tuple)):
+    if target_speaker is not None and not isinstance(target_speaker, (list, tuple)):
         target_speaker = [target_speaker]
     assert not any([
         (data_dir / dataset_name).exists() for dataset_name in dataset_names
@@ -238,7 +238,11 @@ def _create_data_dir(
         for ref_ch in ref_channels:
             org_example_id = example['example_id']
             dataset_name = example['dataset']
-            for t_spk in target_speaker:
+            if target_speaker is None:
+                t_spks = range(len(example['speaker_id']))
+            else:
+                t_spks = target_speaker
+            for t_spk in t_spks:
                 speaker_id = example['speaker_id'][t_spk]
                 example_id = speaker_id + '_' + org_example_id
                 example_id += f'_c{ref_ch}' if len(ref_channels) > 1 else ''

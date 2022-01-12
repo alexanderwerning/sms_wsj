@@ -36,7 +36,7 @@ kaldi_root = Path(os.environ['KALDI_ROOT'])
 @ex.command
 def create_dir(
         audio_dir: Path, dataset_names=None, base_dir=None, json_path=None, db=None,
-        data_type='sms_enh', id_to_file_name='{id}_{spk}.wav', target_speaker=0
+        data_type='sms_enh', id_to_file_name='{id}_{spk}.wav', target_speaker=None
 ):
     """
 
